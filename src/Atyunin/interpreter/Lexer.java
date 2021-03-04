@@ -2,119 +2,106 @@ package Atyunin.interpreter;
 
 import Atyunin.interpreter.tokens.LexType;
 import Atyunin.interpreter.tokens.Lexeme;
+import Atyunin.interpreter.tokens.Terminal;
+
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Lexer {
 
-    ArrayList <Lexeme> code;
+    private ArrayList <Lexeme> lexeme_list;
 
-    ArrayList <Pattern> pattern;
-    ArrayList <LexType> lexType;
+    private ArrayList <Terminal> terminals;
 
-    Lexer () {
+    public Lexer () {
 
-        code = new ArrayList<Lexeme>();
-        pattern = new ArrayList<Pattern>();
-        lexType = new ArrayList<LexType>();
+        lexeme_list = new ArrayList<Lexeme>();
 
-        pattern.add(Pattern.compile("while"));
-        lexType.add(LexType.WHILE);
+        terminals = new ArrayList<Terminal>();
 
-        pattern.add(Pattern.compile("if"));
-        lexType.add(LexType.IF);
-
-        pattern.add(Pattern.compile("elif"));
-        lexType.add(LexType.ELIF);
-
-        pattern.add(Pattern.compile("else"));
-        lexType.add(LexType.ELSE);
-
-        pattern.add(Pattern.compile("[a-zA-Z]+"));
-        lexType.add(LexType.NAME);
-
-        pattern.add(Pattern.compile("0|([1-9][0-9]*)"));
-        lexType.add(LexType.NUM);
-
-        pattern.add(Pattern.compile("[;]"));
-        lexType.add(LexType.SEMICOLON);
-
-        pattern.add(Pattern.compile("[=]"));
-        lexType.add(LexType.OP_ASSIGN);
-
-        pattern.add(Pattern.compile("[*]"));
-        lexType.add(LexType.OP_MUL);
-
-        pattern.add(Pattern.compile("[/]"));
-        lexType.add(LexType.OP_DIV);
-
-        pattern.add(Pattern.compile("[+]"));
-        lexType.add(LexType.OP_ADD);
-
-        pattern.add(Pattern.compile("[-]"));
-        lexType.add(LexType.OP_SUB);
-
-        pattern.add(Pattern.compile("[(]"));
-        lexType.add(LexType.L_BRACKET);
-
-        pattern.add(Pattern.compile("[)]"));
-        lexType.add(LexType.R_BRACKET);
-
-        pattern.add(Pattern.compile("[{]"));
-        lexType.add(LexType.L_BRACE);
-
-        pattern.add(Pattern.compile("[}]"));
-        lexType.add(LexType.R_BRACE);
+        terminals.add(new Terminal("while", LexType.WHILE,1));
+        terminals.add(new Terminal("if", LexType.IF,1));
+        terminals.add(new Terminal("elif", LexType.ELIF,1));
+        terminals.add(new Terminal("else", LexType.ELSE,1));
+        terminals.add(new Terminal("[a-zA-Z]+", LexType.NAME));
+        terminals.add(new Terminal("0|([1-9][0-9]*)", LexType.NUM));
+        terminals.add(new Terminal("[;]", LexType.SEMICOLON));
+        terminals.add(new Terminal("[=]", LexType.OP_ASSIGN));
+        terminals.add(new Terminal("[*]", LexType.OP_MUL));
+        terminals.add(new Terminal("[/]", LexType.OP_DIV));
+        terminals.add(new Terminal("[+]", LexType.OP_ADD));
+        terminals.add(new Terminal("[-]", LexType.OP_SUB));
+        terminals.add(new Terminal("[(]", LexType.L_BRACKET));
+        terminals.add(new Terminal("[)]", LexType.R_BRACKET));
+        terminals.add(new Terminal("[{]", LexType.L_BRACE));
+        terminals.add(new Terminal("[}]", LexType.R_BRACE));
     }
 
-    public void analysis (String source) {
+    public void analysis (String source) throws Exception {
 
         double time_analysis = System.nanoTime();
 
         int position = 0;
 
-        Matcher matcher;
+        while (position != source.length()) {
 
-        do {
-
-            while (source.charAt(position) == ' ' || source.charAt(position) == '\n') {
+            if (source.charAt(position) == ' ' || source.charAt(position) == '\n') {
                 position++;
                 continue;
             }
 
-            for(int i = 0; i < pattern.size(); i++) {
-                
-                matcher = pattern.get(i).matcher(source);
-                
-                if (matcher.find(position) && matcher.start() == position) {
+            StringBuilder buffer = new StringBuilder();
 
-                    position = matcher.end();
+            while (position != source.length()) {
 
-                    if (lexType.get(i) == LexType.NAME)
-                        code.add(Lexeme.create_lexeme(lexType.get(i), source.substring(matcher.start(), matcher.end())));
-                    else if (lexType.get(i) == LexType.NUM)
-                        code.add(Lexeme.create_lexeme(lexType.get(i), Integer.parseInt(source.substring(matcher.start(), matcher.end()))));
-                    else
-                        code.add(Lexeme.create_lexeme(lexType.get(i)));
+                buffer.append(source.charAt(position));
+                position++;
 
+                Terminal terminal = look_terminal(buffer);
+
+                if (terminal == null) {
+
+                    buffer.deleteCharAt(buffer.length() - 1);
+                    position--;
+                    terminal = look_terminal(buffer);
+                    lexeme_list.add(new Lexeme(terminal.get_type(), buffer.toString()));
+
+                    buffer = null;
                     break;
                 }
             }
-        } while (position != source.length() - 1);
+
+            if (buffer != null)
+                throw new Exception();
+
+        }
 
         System.out.println("[Lexer] time analysis: " + (System.nanoTime() - time_analysis) / 1_000_000_000.0 + "ms");
     }
+
+    private Terminal look_terminal (StringBuilder string) {
+
+        Terminal found_terminal = null;
+
+        for (Terminal terminal: terminals) {
+
+            if (terminal.matches(string)) {
+                found_terminal = terminal.compare_priority(found_terminal);
+            }
+        }
+
+        return found_terminal;
+    }
     
-    public void print_lex () {
+    public void print_lexeme_list() {
 
         System.out.println("[Lexer] table lexemes: ");
         System.out.printf("%-20s%-20s\n", "Name lexeme", "Value");
 
-        for (Lexeme lexeme: code) {
+        for (Lexeme lexeme: lexeme_list) {
 
-            System.out.printf("%-20s%-20s\n", lexeme.get_type(), lexeme.get_value() == null ? " " : lexeme.get_value().toString());
-
+            lexeme.println();
         }
     }
 }

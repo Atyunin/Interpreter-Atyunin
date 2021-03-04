@@ -6,7 +6,11 @@ public class Main {
 
         TextDriver text = new TextDriver("SourceFiles/Example_1.txt");
         Lexer lexer = new Lexer();
-        lexer.analysis(text.get_source());
-        lexer.print_lex();
+        try {
+            lexer.analysis(text.get_source());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        lexer.print_lexeme_list();
     }
 }
