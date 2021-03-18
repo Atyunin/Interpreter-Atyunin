@@ -1,5 +1,6 @@
 package Atyunin.interpreter.tokens;
 
+
 public class Lexeme {
 
     private LexType type;

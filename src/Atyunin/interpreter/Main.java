@@ -11,6 +11,6 @@ public class Main {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        lexer.print_lexeme_list();
+        lexer.printLexemeList();
     }
 }

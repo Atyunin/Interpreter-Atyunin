@@ -5,13 +5,10 @@ import Atyunin.interpreter.tokens.Lexeme;
 import Atyunin.interpreter.tokens.Terminal;
 
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Lexer {
 
     private ArrayList <Lexeme> lexeme_list;
-
     private ArrayList <Terminal> terminals;
 
     public Lexer () {
@@ -43,44 +40,41 @@ public class Lexer {
         double time_analysis = System.nanoTime();
 
         int position = 0;
+        StringBuilder buffer = null;
 
         while (position != source.length()) {
 
-            if (source.charAt(position) == ' ' || source.charAt(position) == '\n') {
+            if ((source.charAt(position) == ' ' || source.charAt(position) == '\n') && buffer == null) {
                 position++;
                 continue;
             }
 
-            StringBuilder buffer = new StringBuilder();
+            if (buffer == null)
+                buffer = new StringBuilder();
 
-            while (position != source.length()) {
+            buffer.append(source.charAt(position++));
 
-                buffer.append(source.charAt(position));
-                position++;
+            Terminal terminal = lookTerminal(buffer);
 
-                Terminal terminal = look_terminal(buffer);
+            if (terminal == null) {
 
-                if (terminal == null) {
+                if (buffer.length() == 1)
+                    throw new Exception();
 
-                    buffer.deleteCharAt(buffer.length() - 1);
-                    position--;
-                    terminal = look_terminal(buffer);
-                    lexeme_list.add(new Lexeme(terminal.get_type(), buffer.toString()));
+                buffer.deleteCharAt(buffer.length() - 1);
+                position--;
+                terminal = lookTerminal(buffer);
+                lexeme_list.add(new Lexeme(terminal.get_type(), buffer.toString()));
 
-                    buffer = null;
-                    break;
-                }
+                buffer = null;
+                continue;
             }
-
-            if (buffer != null)
-                throw new Exception();
-
         }
 
         System.out.println("[Lexer] time analysis: " + (System.nanoTime() - time_analysis) / 1_000_000_000.0 + "ms");
     }
 
-    private Terminal look_terminal (StringBuilder string) {
+    private Terminal lookTerminal(StringBuilder string) {
 
         Terminal found_terminal = null;
 
@@ -94,7 +88,7 @@ public class Lexer {
         return found_terminal;
     }
     
-    public void print_lexeme_list() {
+    public void printLexemeList() {
 
         System.out.println("[Lexer] table lexemes: ");
         System.out.printf("%-20s%-20s\n", "Name lexeme", "Value");
