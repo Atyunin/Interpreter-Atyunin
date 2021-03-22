@@ -17,7 +17,7 @@ public class Lexeme {
         this(type, null);
     }
 
-    public LexType get_type () {
+    public LexType getType() {
 
         return type;
     }

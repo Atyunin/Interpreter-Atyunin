@@ -15,13 +15,26 @@ public enum LexType {
 
     //операторы
     OP_ASSIGN,
-    OP_MUL,
-    OP_DIV,
-    OP_ADD,
-    OP_SUB,
     SEMICOLON,
     L_BRACKET,
     R_BRACKET,
     L_BRACE,
-    R_BRACE
+    R_BRACE,
+
+    //Арифметичекие операторы
+    OP_MUL,
+    OP_DIV,
+    OP_ADD,
+    OP_SUB,
+
+    //Логические операторы
+    OP_EQUAL,
+    OP_MORE,
+    OP_LESS,
+    OP_MORE_EQUAL,
+    OP_LESS_EQUAL,
+    OP_NOT_EQUAL,
+
+    //Лексема окончания кода
+    END,
 }

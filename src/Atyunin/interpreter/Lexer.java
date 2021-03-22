@@ -8,12 +8,12 @@ import java.util.ArrayList;
 
 public class Lexer {
 
-    private ArrayList <Lexeme> lexeme_list;
+    private ArrayList <Lexeme> lexemes;
     private ArrayList <Terminal> terminals;
 
     public Lexer () {
 
-        lexeme_list = new ArrayList<Lexeme>();
+        lexemes = new ArrayList<Lexeme>();
 
         terminals = new ArrayList<Terminal>();
 
@@ -33,6 +33,12 @@ public class Lexer {
         terminals.add(new Terminal("[)]", LexType.R_BRACKET));
         terminals.add(new Terminal("[{]", LexType.L_BRACE));
         terminals.add(new Terminal("[}]", LexType.R_BRACE));
+        terminals.add(new Terminal("==", LexType.OP_EQUAL));
+        terminals.add(new Terminal("<>", LexType.OP_NOT_EQUAL));
+        terminals.add(new Terminal(">", LexType.OP_MORE));
+        terminals.add(new Terminal("<", LexType.OP_LESS));
+        terminals.add(new Terminal(">=", LexType.OP_MORE_EQUAL));
+        terminals.add(new Terminal("<=", LexType.OP_LESS_EQUAL));
     }
 
     public void analysis (String source) throws Exception {
@@ -64,12 +70,14 @@ public class Lexer {
                 buffer.deleteCharAt(buffer.length() - 1);
                 position--;
                 terminal = lookTerminal(buffer);
-                lexeme_list.add(new Lexeme(terminal.get_type(), buffer.toString()));
+                lexemes.add(new Lexeme(terminal.get_type(), buffer.toString()));
 
                 buffer = null;
                 continue;
             }
         }
+
+        lexemes.add(new Lexeme(LexType.END, ""));
 
         System.out.println("[Lexer] time analysis: " + (System.nanoTime() - time_analysis) / 1_000_000_000.0 + "ms");
     }
@@ -87,13 +95,18 @@ public class Lexer {
 
         return found_terminal;
     }
+
+    public ArrayList<Lexeme> getLexemes () {
+
+        return lexemes;
+    }
     
     public void printLexemeList() {
 
         System.out.println("[Lexer] table lexemes: ");
         System.out.printf("%-20s%-20s\n", "Name lexeme", "Value");
 
-        for (Lexeme lexeme: lexeme_list) {
+        for (Lexeme lexeme: lexemes) {
 
             lexeme.println();
         }

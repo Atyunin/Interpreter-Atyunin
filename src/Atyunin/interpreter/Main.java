@@ -12,5 +12,7 @@ public class Main {
             e.printStackTrace();
         }
         lexer.printLexemeList();
+        Parser parser = new Parser(lexer.getLexemes());
+        parser.analysis();
     }
 }

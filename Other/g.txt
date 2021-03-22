@@ -1,0 +1,13 @@
+Language -> languageToken*
+languageToken -> assignConst | ifConst | whileConst
+assignConst -> NAME OP_ASSIGN expression SEMICOLON
+ifConst -> IF L_BRACKET expression R_BRACKET block elifConst* elseConst?
+elifConst -> ELIF L_BRACKET expression R_BRACKET block
+elseConst -> ELSE block
+whileConst -> WHILE L_BRACKET expression R_BRACKET block
+block -> languageToken | (L_BRACE languageToken* R_BRACE)
+
+expression -> (member | bracket_member) (op expression)*
+member -> NUM | NAME
+op -> OP_SUB | OP_MUL | OP_ADD | OP_DIV
+brakect_member -> L_BRACKET expression R_BRACKET
