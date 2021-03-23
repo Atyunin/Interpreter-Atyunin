@@ -27,6 +27,11 @@ public class Lexeme {
         return value;
     }
 
+    public void set_value (String s) {
+
+        this.value = s;
+    }
+
     public void print () {
 
         System.out.printf("%-20s%-20s", type, value == null ? " " : value);

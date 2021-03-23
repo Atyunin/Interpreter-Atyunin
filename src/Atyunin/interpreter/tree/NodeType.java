@@ -3,8 +3,13 @@ package Atyunin.interpreter.tree;
 public enum NodeType {
 
     Language,
-    LanguageToken,
+    LanguageConst,
     AssignConst,
+    WhileConst,
+    IfConst,
+    ElifConst,
+    ElseConst,
+    Block,
     Expression,
     Member,
     Op,

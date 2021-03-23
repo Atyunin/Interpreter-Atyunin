@@ -14,5 +14,9 @@ public class Main {
         lexer.printLexemeList();
         Parser parser = new Parser(lexer.getLexemes());
         parser.analysis();
+        parser.AST.print();
+        TranslatorRPN RPN = new TranslatorRPN(parser.getTree());
+        RPN.translate();
+        RPN.print();
     }
 }

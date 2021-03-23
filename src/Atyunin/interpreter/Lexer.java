@@ -43,7 +43,7 @@ public class Lexer {
 
     public void analysis (String source) throws Exception {
 
-        double time_analysis = System.nanoTime();
+        long time_analysis = System.nanoTime();
 
         int position = 0;
         StringBuilder buffer = null;
@@ -79,7 +79,7 @@ public class Lexer {
 
         lexemes.add(new Lexeme(LexType.END, ""));
 
-        System.out.println("[Lexer] time analysis: " + (System.nanoTime() - time_analysis) / 1_000_000_000.0 + "ms");
+        System.out.println("[Lexer] time analysis: " + (System.nanoTime() - time_analysis) / 1_000_000.0 + "ms");
     }
 
     private Terminal lookTerminal(StringBuilder string) {

@@ -35,6 +35,10 @@ public enum LexType {
     OP_LESS_EQUAL,
     OP_NOT_EQUAL,
 
+    //Служебная лексема перехода
+    JMP_VALUE,
+    JMP,
+
     //Лексема окончания кода
     END,
 }
