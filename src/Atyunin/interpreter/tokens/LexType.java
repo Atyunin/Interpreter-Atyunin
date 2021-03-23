@@ -12,6 +12,7 @@ public enum LexType {
 
     //литералы
     NUM,
+    BOOLEAN,
 
     //операторы
     OP_ASSIGN,

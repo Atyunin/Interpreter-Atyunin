@@ -18,5 +18,8 @@ public class Main {
         TranslatorRPN RPN = new TranslatorRPN(parser.getTree());
         RPN.translate();
         RPN.print();
+        StackMachine machine = new StackMachine(RPN.getRPN());
+        machine.run();
+        machine.print();
     }
 }

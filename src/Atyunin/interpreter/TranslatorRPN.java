@@ -43,7 +43,31 @@ public class TranslatorRPN {
         } else if (nodeConst.getType() == IfConst) {
             
             ifConst(nodeConst);
+        } else if (nodeConst.getType() == WhileConst) {
+
+            whileConst(nodeConst);
         }
+    }
+
+    private void whileConst(TreeNode nodeConst) {
+
+        int start = RPN.size();
+
+        expression(nodeConst.getNodes().get(0));
+        flushTexas();
+
+        Lexeme point = new Lexeme(JMP_VALUE);
+        addOprand(point);
+
+        addOprand(nodeConst.getLeafs().get(0));
+        block(nodeConst.getNodes().get(1));
+
+        Lexeme endPoint = new Lexeme(JMP_VALUE);
+        addOprand(endPoint);
+        addOprand(new Lexeme (JMP));
+
+        point.set_value(Integer.toString(RPN.size()));
+        endPoint.set_value(Integer.toString(start));
     }
 
     private void ifConst(TreeNode nodeConst) {
@@ -155,14 +179,24 @@ public class TranslatorRPN {
 
         if (op.getType() == OP_ASSIGN)
             priority = 0;
-        else if (op.getType() == OP_ADD)
-            priority = 1;
+        else if (op.getType() == OP_LESS)
+            priority = 5;
+        else if (op.getType() == OP_MORE)
+            priority = 5;
+        else if (op.getType() == OP_LESS_EQUAL)
+            priority = 5;
+        else if (op.getType() == OP_MORE_EQUAL)
+            priority = 5;
+        else if (op.getType() == OP_NOT_EQUAL)
+            priority = 5;
+        else if (op.getType() == OP_EQUAL)
+            priority = 5;
         else if (op.getType() == OP_SUB)
-            priority = 1;
+            priority = 9;
         else if (op.getType() == OP_MUL)
-            priority = 2;
+            priority = 10;
         else if (op.getType() == OP_DIV)
-            priority = 2;
+            priority = 10;
         else
             priority = 0;
 
@@ -225,5 +259,10 @@ public class TranslatorRPN {
             System.out.printf("%-4s", i++);
             lexeme.println();
         }
+    }
+
+    public ArrayList<Lexeme> getRPN() {
+
+        return RPN;
     }
 }

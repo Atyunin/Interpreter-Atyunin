@@ -1,8 +1,7 @@
-if (12) {
+Par = 10;
+index = 0;
 
-} elif (12 < 12) {
-
-} else {
-
-    Par = 69;
+while (Par <> 0) {
+    Par = Par - 1;
+    index = index + 10;
 }
