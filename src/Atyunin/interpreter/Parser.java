@@ -35,7 +35,7 @@ public class Parser {
                 languageConst(AST);
             } catch (Exception e) {
 
-                System.out.println("Синтаксическая ошибка: " + position + currentLexeme());
+                //System.out.println("Синтаксическая ошибка: " + position + currentLexeme());
                 e.printStackTrace();
                 break;
             }
@@ -51,18 +51,135 @@ public class Parser {
 
         if (currentLexeme() == NAME) {
 
-            assignConst(astNext);
+            if (nextLexeme() == OP_DOT) {
+
+                callFuncConst(astNext);
+            } else {
+
+                assignConst(astNext);
+            }
         } else if (currentLexeme() == WHILE) {
 
             whileConst(astNext);
         } else if (currentLexeme() == IF) {
 
             ifConst(astNext);
+        } else if (currentLexeme() == DO) {
 
-        } else {
+            doWhileConst(astNext);
+        } else if (currentLexeme() == FOR) {
+
+            forConst(astNext);
+        } else if (currentLexeme() == PRINT) {
+
+            printConst(astNext);
+        } else if (currentLexeme() == LIST) {
+
+            listConst(astNext);
+        } else if (currentLexeme() == SET) {
+
+            setConst(astNext);
+        }else {
 
             throw new Exception();
         }
+    }
+
+    private void callFuncConst(TreeNode astTop) throws Exception {
+
+        TreeNode astNext = new TreeNode(CallFuncConst);
+        astTop.addNode(astNext);
+
+        if (currentLexeme() == NAME) {
+            astNext.addLeaf(LexCheck(NAME));
+            astNext.addLeaf(LexCheck(OP_DOT));
+            astNext.addLeaf(new Lexeme (FUNC, LexCheck(NAME).get_value()));
+            astNext.addLeaf(LexCheck(L_BRACKET));
+
+            if (currentLexeme() != R_BRACKET) {
+                expression(astNext);
+                while (currentLexeme() == COMMA) {
+                    astNext.addLeaf(LexCheck(COMMA));
+                    expression(astNext);
+                }
+            }
+            astNext.addLeaf(LexCheck(R_BRACKET));
+            astNext.addLeaf(LexCheck(SEMICOLON));
+        }
+        else
+            throw new Exception();
+    }
+
+    private void listConst(TreeNode astTop) throws Exception {
+
+        TreeNode astNext = new TreeNode(ListConst);
+        astTop.addNode(astNext);
+
+        astNext.addLeaf(LexCheck(LIST));
+        astNext.addLeaf(LexCheck(NAME));
+        astNext.addLeaf(LexCheck(SEMICOLON));
+    }
+
+    private void setConst(TreeNode astTop) throws Exception {
+
+        TreeNode astNext = new TreeNode(SetConst);
+        astTop.addNode(astNext);
+
+        astNext.addLeaf(LexCheck(SET));
+        astNext.addLeaf(LexCheck(NAME));
+        astNext.addLeaf(LexCheck(SEMICOLON));
+    }
+
+    private void printConst(TreeNode astTop) throws Exception {
+
+        TreeNode astNext = new TreeNode(PrintConst);
+        astTop.addNode(astNext);
+
+        astNext.addLeaf(LexCheck(PRINT));
+        expression(astNext);
+        astNext.addLeaf(LexCheck(SEMICOLON));
+    }
+
+
+
+    private void doWhileConst(TreeNode astTop) throws Exception {
+
+        TreeNode astNext = new TreeNode(DoWhileConst);
+        astTop.addNode(astNext);
+
+        astNext.addLeaf(LexCheck(DO));
+        block(astNext);
+        astNext.addLeaf(LexCheck(WHILE));
+        astNext.addLeaf(LexCheck(L_BRACKET));
+        expression(astNext);
+        astNext.addLeaf(LexCheck(R_BRACKET));
+        astNext.addLeaf(LexCheck(SEMICOLON));
+    }
+
+    private void forConst(TreeNode astTop) throws Exception {
+
+        TreeNode astNext = new TreeNode(ForConst);
+        astTop.addNode(astNext);
+
+        astNext.addLeaf(LexCheck(FOR));
+        astNext.addLeaf(LexCheck(L_BRACKET));
+        assignConstFor(astNext);
+        astNext.addLeaf(LexCheck(SEMICOLON));
+        expression(astNext);
+        astNext.addLeaf(LexCheck(SEMICOLON));
+        assignConstFor(astNext);
+        astNext.addLeaf(LexCheck(R_BRACKET));
+        block(astNext);
+    }
+
+    private void assignConstFor(TreeNode astTop) throws Exception {
+
+        TreeNode astNext = new TreeNode(AssignConst);
+        astTop.addNode(astNext);
+
+        astNext.addLeaf(LexCheck(NAME));
+        astNext.addLeaf(LexCheck(OP_ASSIGN));
+        expression(astNext);
     }
 
     private void ifConst(TreeNode astTop) throws Exception {
@@ -160,7 +277,12 @@ public class Parser {
 
         if (currentLexeme() == NUM || currentLexeme() == NAME) {
 
-            member(astNext);
+            if (currentLexeme() == NAME && nextLexeme() == OP_DOT) {
+
+                memberCont(astNext);
+            } else {
+                member(astNext);
+            }
         } else if (currentLexeme() == L_BRACKET) {
 
             memberBracket(astNext);
@@ -175,6 +297,31 @@ public class Parser {
             expression(astNext);
         }
     }
+
+    private void memberCont(TreeNode astTop) throws Exception {
+
+        TreeNode astNext = new TreeNode(MemberCont);
+        astTop.addNode(astNext);
+
+        if (currentLexeme() == NAME) {
+            astNext.addLeaf(LexCheck(NAME));
+            astNext.addLeaf(LexCheck(OP_DOT));
+            astNext.addLeaf(new Lexeme (FUNC, LexCheck(NAME).get_value()));
+            astNext.addLeaf(LexCheck(L_BRACKET));
+
+            if (currentLexeme() != R_BRACKET) {
+                expression(astNext);
+                while (currentLexeme() == COMMA) {
+                    astNext.addLeaf(LexCheck(COMMA));
+                    expression(astNext);
+                }
+            }
+            astNext.addLeaf(LexCheck(R_BRACKET));
+        }
+        else
+            throw new Exception();
+    }
+
 
     private void op(TreeNode astTop) throws Exception {
 
@@ -208,36 +355,6 @@ public class Parser {
             throw new Exception();
     }
 
-    /*private void expression(TreeNode astTop) throws Exception {
-
-        TreeNode astNext = new TreeNode(Expression);
-        astTop.addNode(astNext);
-
-        if (currentLexeme() == NUM || currentLexeme() == NAME) {
-
-            astNext.addLeaf(getNextLexeme());
-            if (isOp(currentLexeme())) {
-
-                astNext.addLeaf(getNextLexeme());
-                expression(astNext);
-            }
-        } else if (currentLexeme() == L_BRACKET) {
-
-            astNext.addLeaf(LexCheck(L_BRACKET));
-            expression(astNext);
-            astNext.addLeaf(LexCheck(R_BRACKET));
-
-            if (isOp(currentLexeme())) {
-
-                astNext.addLeaf(getNextLexeme());
-                expression(astNext);
-            }
-        } else {
-
-            throw new Exception();
-        }
-    }*/
-
     private Lexeme LexCheck(LexType type) throws Exception {
 
         if (currentLexeme() != type)
@@ -253,7 +370,7 @@ public class Parser {
 
     private LexType nextLexeme () {
 
-        return lexemes.get(position++).getType();
+        return lexemes.get(position + 1).getType();
     }
 
     private LexType currentLexeme () {

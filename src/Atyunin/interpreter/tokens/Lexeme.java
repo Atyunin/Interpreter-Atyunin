@@ -12,6 +12,12 @@ public class Lexeme {
         this.value = value;
     }
 
+    public Lexeme(LexType type, int value) {
+
+        this.type = type;
+        this.value = Integer.toString(value);
+    }
+
     public Lexeme(LexType type) {
 
         this(type, null);

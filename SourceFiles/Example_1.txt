@@ -1,7 +1,33 @@
-Par = 10;
-index = 0;
+a = 10;
+list lol;
+set kek;
+lol.add(0, 1);
+lol.add(0, 2);
+lol.add(0, 3);
+lol.add(0, 4);
+lol.add(0, 5);
+lol.add(0, 5);
+lol.add(0, 5);
 
-while (Par <> 0) {
-    Par = Par - 1;
-    index = index + 10;
+kek.add(10);
+kek.add(10);
+kek.add(10);
+kek.add(10);
+kek.add(10);
+kek.add(5);
+kek.add(13);
+kek.delete(5);
+
+if (kek.contains(5)) {
+
+print 5;
+} else {
+
+print 10;
 }
+
+kek.printSet();
+
+lol.printList();
+a = a + lol.peek(4);
+print a;

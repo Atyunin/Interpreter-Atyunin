@@ -2,6 +2,8 @@ package Atyunin.interpreter;
 
 import Atyunin.interpreter.tokens.LexType;
 import Atyunin.interpreter.tokens.Lexeme;
+import Atyunin.interpreter.util.HashSetInt;
+import Atyunin.interpreter.util.LinkedListInt;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,16 +19,24 @@ public class StackMachine {
     private int index;
 
     private HashMap <String, Integer> variables;
+    private HashMap <String, LinkedListInt> variablesList;
+    private HashMap <String, HashSetInt> variablesSet;
     private LinkedList <Lexeme> stack;
 
     public StackMachine (ArrayList <Lexeme> RPN) {
 
         this.RPN = RPN;
         this.variables = new HashMap<>();
+        this.variablesList = new HashMap<>();
+        this.variablesSet = new HashMap<>();
         this.stack = new LinkedList<>();
     }
 
     public void run () {
+
+        long time_analysis = System.nanoTime();
+
+        System.out.println("[StackMachine] Output:");
 
         for (index = 0; index < RPN.size(); index++) {
 
@@ -76,10 +86,143 @@ public class StackMachine {
                 case JMP:
                     index = Integer.parseInt(stack.removeFirst().get_value()) - 1;
                     break;
+                case DO:
+                    doWhileConst(stack.removeFirst(), stack.removeFirst());
+                    break;
+                case FOR:
+                    ForConst(stack.removeFirst(), stack.removeFirst());
+                    break;
+                case FUNC:
+                    funcConst(RPN.get(index));
+                    break;
+                case PRINT:
+                    printConst(stack.removeFirst());
+                    break;
+                case LIST:
+                    listConst(stack.removeFirst());
+                    break;
+                case SET:
+                    setConst(stack.removeFirst());
+                    break;
                 default:
                     stack.addFirst(RPN.get(index));
             }
         }
+
+        System.out.println("[StackMachine] Time run: " + (System.nanoTime() - time_analysis) / 1_000_000.0 + "ms");
+    }
+
+    private void setConst(Lexeme a) {
+
+        if(variablesList.containsKey(a.get_value()) || variables.containsKey(a.get_value())) {
+
+            //throw new Exeption ();
+        } else {
+
+            variablesSet.put(a.get_value(), new HashSetInt());
+        }
+    }
+
+    private void listConst(Lexeme a) {
+
+        if(variablesList.containsKey(a.get_value()) || variables.containsKey(a.get_value())) {
+
+            //throw new Exeption ();
+        } else {
+
+            variablesList.put(a.get_value(), new LinkedListInt());
+        }
+    }
+
+    private void funcConst(Lexeme lexeme) {
+
+        Lexeme name = stack.removeFirst();
+
+        if (variablesList.containsKey(name.get_value())) {
+
+
+            if (lexeme.get_value().equals("add")) {
+
+                Lexeme value = stack.removeFirst();
+                Lexeme index = stack.removeFirst();
+
+
+                int index_value = index.getType() == NAME ? variables.get(index.get_value()) : Integer.parseInt(index.get_value());
+                int value_value = value.getType() == NAME ? variables.get(value.get_value()) : Integer.parseInt(value.get_value());
+
+                variablesList.get(name.get_value()).add(index_value, value_value);
+            } else if (lexeme.get_value().equals("peek")) {
+
+                Lexeme index = stack.removeFirst();
+
+                int index_value = index.getType() == NAME ? variables.get(index.get_value()) : Integer.parseInt(index.get_value());
+
+                stack.addFirst(new Lexeme(LexType.NUM, variablesList.get(name.get_value()).peek(index_value)));
+            } else if (lexeme.get_value().equals("get")) {
+
+                Lexeme index = stack.removeFirst();
+
+                int index_value = index.getType() == NAME ? variables.get(index.get_value()) : Integer.parseInt(index.get_value());
+
+                stack.addFirst(new Lexeme(LexType.NUM, variablesList.get(name.get_value()).get(index_value)));
+            } else if (lexeme.get_value().equals("printList")) {
+                variablesList.get(name.get_value()).printList();
+                System.out.println();
+            }
+        } else if (variablesSet.containsKey(name.get_value())) {
+
+
+            if (lexeme.get_value().equals("add")) {
+
+                Lexeme value = stack.removeFirst();
+
+                int value_value = value.getType() == NAME ? variables.get(value.get_value()) : Integer.parseInt(value.get_value());
+
+                variablesSet.get(name.get_value()).add(value_value);
+            } else if (lexeme.get_value().equals("contains")) {
+
+                Lexeme index = stack.removeFirst();
+
+                int value_value = index.getType() == NAME ? variables.get(index.get_value()) : Integer.parseInt(index.get_value());
+
+                stack.addFirst(new Lexeme(BOOLEAN, variablesSet.get(name.get_value()).contains(value_value) == -1 ? Boolean.toString(false) : Boolean.toString(true)));
+            } else if (lexeme.get_value().equals("delete")) {
+
+                Lexeme index = stack.removeFirst();
+
+                int value_value = index.getType() == NAME ? variables.get(index.get_value()) : Integer.parseInt(index.get_value());
+
+                variablesSet.get(name.get_value()).delete(value_value);
+            } else if (lexeme.get_value().equals("printSet")) {
+
+                variablesSet.get(name.get_value()).print();
+                System.out.println();
+            }
+        }
+    }
+
+    private void printConst(Lexeme a) {
+
+        int a_value = a.getType() == NAME ? variables.get(a.get_value()) : Integer.parseInt(a.get_value());
+        System.out.println(a_value);
+    }
+
+    private void ForConst(Lexeme jmp, Lexeme bool) {
+
+        int jmp_value = Integer.parseInt(jmp.get_value());
+        boolean bool_value = Boolean.parseBoolean(bool.get_value());
+
+        if (!bool_value)
+            index = jmp_value - 1;
+    }
+
+    private void doWhileConst(Lexeme jmp, Lexeme bool) {
+
+        int jmp_value = Integer.parseInt(jmp.get_value());
+        boolean bool_value = Boolean.parseBoolean(bool.get_value());
+
+        if (bool_value)
+            index = jmp_value - 1;
     }
 
     private void whileConst(Lexeme jmp, Lexeme bool) {
@@ -194,6 +337,8 @@ public class StackMachine {
     }
 
     public void print () {
+
+        System.out.println("[StackMachine] Variable values:");
 
         Set <String> keys = variables.keySet();
 

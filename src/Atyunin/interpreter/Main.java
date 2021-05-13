@@ -1,5 +1,10 @@
 package Atyunin.interpreter;
 
+import Atyunin.interpreter.util.HashSetInt;
+import Atyunin.interpreter.util.LinkedListInt;
+
+import java.util.LinkedList;
+
 public class Main {
 
     static public void main (String args[]) {
@@ -22,4 +27,31 @@ public class Main {
         machine.run();
         machine.print();
     }
+
+    /*public static void main(String[] args) {
+
+        HashSetInt list = new HashSetInt();
+
+        list.add(1);
+        list.add(5);
+        list.add(9);
+        list.add(13);
+        list.add(17);
+        list.add(21);
+        list.add(25);
+        list.add(1);
+        list.add(5);
+        list.add(9);
+        list.add(13);
+        list.add(17);
+        list.add(21);
+        list.add(25);
+
+
+        list.print();
+
+        list.delete(5);
+
+        list.print();
+    }*/
 }

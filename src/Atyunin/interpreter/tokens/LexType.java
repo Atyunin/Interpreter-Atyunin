@@ -9,6 +9,12 @@ public enum LexType {
     IF,
     ELIF,
     ELSE,
+    FOR,
+    DO,
+    PRINT,
+    LIST,
+    SET,
+
 
     //литералы
     NUM,
@@ -21,6 +27,8 @@ public enum LexType {
     R_BRACKET,
     L_BRACE,
     R_BRACE,
+    OP_DOT,
+    COMMA,
 
     //Арифметичекие операторы
     OP_MUL,
@@ -39,6 +47,10 @@ public enum LexType {
     //Служебная лексема перехода
     JMP_VALUE,
     JMP,
+
+    FUNC,
+
+    ERROR,
 
     //Лексема окончания кода
     END,

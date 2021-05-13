@@ -1,14 +1,21 @@
 Language -> languageToken*
-languageToken -> assignConst | ifConst | whileConst
+languageToken -> assignConst | ifConst | whileConst | forConst | doWhileConst | forConst | printConst
 assignConst -> NAME OP_ASSIGN expression SEMICOLON
 ifConst -> IF L_BRACKET expression R_BRACKET block elifConst* elseConst?
 elifConst -> ELIF L_BRACKET expression R_BRACKET block
 elseConst -> ELSE block
 whileConst -> WHILE L_BRACKET expression R_BRACKET block
+doWhileConst -> do block while L_BRACKET expression R_BRACKET SEMICOLON
+printConst -> PRINT expression SEMICOLON
 block -> languageToken | (L_BRACE languageToken* R_BRACE)
 
+forConst -> FOR L_BRACKET assignConstFor expression SEMICOLON assignConstFor R_BRACKET block
+assignConstFor -> NAME OP_ASSIGN expression
+
+// с проверкой типов
 expression -> (member | bracket_member) (op expression)*
-member -> NUM | NAME
+member -> NUM | NAME | list_member
+list_member -> NAME OP_DOT L_BRACKET expression (OP_COMMA exprssion)* R_BRACKET
 op -> OP_SUB | OP_MUL | OP_ADD | OP_DIV
 brakect_member -> L_BRACKET expression R_BRACKET
 

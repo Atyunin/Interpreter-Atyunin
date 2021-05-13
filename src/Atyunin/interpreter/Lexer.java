@@ -5,6 +5,7 @@ import Atyunin.interpreter.tokens.Lexeme;
 import Atyunin.interpreter.tokens.Terminal;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
 
 public class Lexer {
 
@@ -21,9 +22,16 @@ public class Lexer {
         terminals.add(new Terminal("if", LexType.IF,1));
         terminals.add(new Terminal("elif", LexType.ELIF,1));
         terminals.add(new Terminal("else", LexType.ELSE,1));
+        terminals.add(new Terminal("for", LexType.FOR,1));
+        terminals.add(new Terminal("do", LexType.DO,1));
+        terminals.add(new Terminal("print", LexType.PRINT,1));
+        terminals.add(new Terminal("list", LexType.LIST,1));
+        terminals.add(new Terminal("set", LexType.SET,1));
         terminals.add(new Terminal("[a-zA-Z]+", LexType.NAME));
         terminals.add(new Terminal("0|([1-9][0-9]*)", LexType.NUM));
         terminals.add(new Terminal("[;]", LexType.SEMICOLON));
+        terminals.add(new Terminal("[.]", LexType.OP_DOT));
+        terminals.add(new Terminal("[,]", LexType.COMMA));
         terminals.add(new Terminal("[=]", LexType.OP_ASSIGN));
         terminals.add(new Terminal("[*]", LexType.OP_MUL));
         terminals.add(new Terminal("[/]", LexType.OP_DIV));
@@ -81,6 +89,40 @@ public class Lexer {
 
         System.out.println("[Lexer] time analysis: " + (System.nanoTime() - time_analysis) / 1_000_000.0 + "ms");
     }
+
+    /*public void analysis (String source) {
+
+        double time_analysis = System.nanoTime();
+
+        int position = 0;
+
+        Matcher matcher;
+
+        do {
+
+            while (source.charAt(position) == ' ' || source.charAt(position) == '\n') {
+                position++;
+                continue;
+            }
+
+            for(int i = 0; i < terminals.size(); i++) {
+
+                matcher = terminals.get(i).get_pattern().matcher(source);
+
+                if (matcher.find(position) && matcher.start() == position) {
+
+                    position = matcher.end();
+
+                    lexemes.add(new Lexeme(terminals.get(i).get_type(), source.substring(matcher.start(), matcher.end())));
+                    break;
+                }
+            }
+        } while (position != source.length() - 1);
+
+        lexemes.add(new Lexeme(LexType.END, ""));
+
+        System.out.println("[Lexer] time analysis: " + (System.nanoTime() - time_analysis) / 1_000_000_000.0 + "ms");
+    }*/
 
     private Terminal lookTerminal(StringBuilder string) {
 
